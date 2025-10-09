@@ -1,15 +1,10 @@
+ 
 import React, { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import { MessageCircle } from "lucide-react"; // <-- added import
 
 export default function ChatBox() {
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      type: "system",
-      content:
-        "Hello! I'm your AI assistant. Ask me to search for contracts or documents in the database.",
-      timestamp: new Date().toISOString(),
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -27,96 +22,147 @@ export default function ChatBox() {
       content: inputMessage,
       timestamp: new Date().toISOString(),
     };
+
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      processUserQuery(userMessage.content);
-      setIsLoading(false);
-    }, 1000);
+    processUserQuery(userMessage.content);
   };
 
-  const processUserQuery = (query) => {
-    const lowerQuery = query.toLowerCase();
-    let responseMessage = {
-      id: Date.now().toString(),
-      type: "bot",
-      content:
-        "I can help you find contracts or documents in our database. Try asking me to 'find contracts' or 'upload a document'.",
-      timestamp: new Date().toISOString(),
-    };
+  const processUserQuery = async (query) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ask`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question: query }),
+        }
+      );
 
-    if (
-      lowerQuery.includes("find contract") ||
-      lowerQuery.includes("search contract")
-    ) {
-      responseMessage.content =
-        "I found the following contracts in the database:";
+    
+      if (!response.ok)
+        throw new Error(`Server responded with ${response.status}`);
+
+      const data = await response.json();
+      const fullAnswer = data.answer || "Sorry, I couldn't understand that.";
+      const responseMessage = {
+        id: Date.now().toString(),
+        type: "bot",
+        content: fullAnswer,
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, responseMessage]);
+    } catch (error) {
+      console.error("API Error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "bot",
+          content:
+            "An error occurred while fetching the response. Please try again.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setMessages((prev) => [...prev, responseMessage]);
   };
 
   return (
-    <div className="flex items-center justify-center h-[89vh] bg-[#F0EAD6] overflow-hidden">
-      <div className="flex flex-col h-[84vh] w-full max-w-2xl bg-[#f2f2f2] rounded-lg shadow-lg p-4  ">
+    <div className="h-screen bg-[#F9FAFB] flex items-center justify-center">
+      <div className="flex flex-col  w-full h-[100vh] bg-white shadow-sm rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-medium text-gray-800">
+            Jetking GPT  (POC)
+          </h2>
+        </div>
 
+        {/* Message Display */}
+        <div className="flex-1 overflow-auto px-6 py-4 space-y-6 bg-[#F9FAFB] relative">
+          {messages.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 space-y-2">
+              <MessageCircle className="h-8 w-8 text-gray-300" />{" "}
+              {/* <-- updated icon */}
+              <h3 className="text-sm font-medium">
+                Welcome to Jetking GPT! 
+              </h3>
+               
+            </div>
+          )}
 
-        {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto space-y-2 scrollbar-hide pr-2">
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.type === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+          <div
+  key={message.id}
+  className={`flex ${
+    message.type === "user" ? "justify-end pr-28" : "justify-start pl-28"
+  }`}
+>
               <div
-                className={`p-3 rounded-lg max-w-md h-auto w-fit ${
+                className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm shadow ${
                   message.type === "user"
-                    ? "bg-[#029c6d] text-[#f2f2f2] rounded-br-none"
-                    : "bg-gray-200 text-gray-800 rounded-bl-none"
+                    ? "bg-blue-500 text-white rounded-br-none"
+                    : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                 }`}
               >
-                <p>{message.content}</p>
-                <p className="text-xs text-right text-[#f2f2f2  ] mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString()}
-                </p>
+                <ReactMarkdown>{message.content}</ReactMarkdown>
               </div>
             </div>
           ))}
+
+          {isLoading && (
+            <div className="flex  ml-28">
+              <div className="bg-white border border-gray-200 rounded-2xl px-4 py-2 text-sm text-gray-500 italic shadow rounded-bl-none ">
+                <span className="dot-flash">Thinking</span>
+              </div>
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
-        <div className="flex items-center gap-2 border-t pt-4">
-          <input
-            type="text"
-            placeholder="Type your message here..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            className="flex-1 border border-gray-300 rounded px-4 py-2 text-sm focus:outline-none"
-          />
-          <button
-            className="text-white px-3 py-2 rounded-full bg-[#002366]"
-            onClick={handleSendMessage}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        {/* Input */}
+        <div className="border-t border-gray-200 px-6 py-4 pr-28 pl-28">
+          <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-blue-300">
+            <input
+              type="text"
+              className="flex-1 border-none outline-none text-sm text-gray-800 placeholder-gray-400"
+              placeholder="Ask about jetking"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={isLoading}
+              className={`ml-3 rounded-full p-2 transition ${
+                isLoading
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+              }`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <svg
+                className="h-4 w-4 text-white"
+                fill="none"
+                stroke="currentColor"
                 strokeWidth="2"
-                d="M5 12h14M12 5l7 7-7 7"
-              />
-            </svg>
-          </button>
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 12h14M12 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
