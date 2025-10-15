@@ -215,7 +215,7 @@ export default function ChatBox() {
         throw new Error(`Server responded with ${response.status}`);
 
       const data = await response.json();
-      const fullAnswer = data.answer || "Sorry, I couldn't understand that.";
+      const fullAnswer = data.result || "Sorry, I couldn't understand that.";
       const responseMessage = {
         id: Date.now().toString(),
         type: "bot",
