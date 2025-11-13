@@ -1,13 +1,27 @@
-import Header from './component/Header';
-import ChatBox from './component/ChatBox';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Sidebar from "./component/Sidebar";
 
-export default function App() {
+import Dashboard from "./pages/Dashboard";
+import UploadExcel from "./pages/UploadExcel";
+
+function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-    
-      
-        <ChatBox />
-      
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-[#f3f4f6] flex">
+        <Sidebar />
+
+        {/* Main Pages */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/upload-excel" element={<UploadExcel />} />
+          </Routes>
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
+
+export default App;
