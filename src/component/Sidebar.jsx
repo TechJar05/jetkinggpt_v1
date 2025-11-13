@@ -6,15 +6,16 @@ const Sidebar = () => {
 
   const isActive = (path) =>
     pathname === path
-      ? "bg-white text-[#c7243b] shadow-sm"
+      ? "bg-[#c7243b] text-white shadow-sm"
       : "text-white hover:bg-white/10";
 
   return (
-    <aside className="h-screen w-60 bg-[#c7243b] text-white flex flex-col sticky top-0">
+    <aside className="h-screen w-60 bg-[#ffffff] text-black flex flex-col sticky top-0">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-white/10">
-        <h1 className="text-xl font-semibold">Class Insights AI</h1>
-      </div>
+       <div className="flex items-center px-6 py-4 border-b border-black/10">
+          <img src="https://myai-aws-bucket.s3.ap-south-1.amazonaws.com/Jetking_Logo.png" alt="Logo" className="h-10 mr-2" />
+          <span className="font-bold text-lg">GPT</span>
+        </div>
 
       <nav className="mt-4 flex-1">
         <ul className="px-3 space-y-2">
@@ -39,7 +40,7 @@ const Sidebar = () => {
                 "/upload-excel"
               )}`}
             >
-              <span>📂</span> <span>Upload Excel</span>
+              <span>📂</span> <span className="text-black">Upload Excel</span>
             </Link>
           </li>
 
