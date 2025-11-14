@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const UploadExcel = () => {
@@ -11,6 +11,8 @@ const UploadExcel = () => {
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleUpload = () => {
     if (!file) return alert("Please select a file first");
     
@@ -20,10 +22,10 @@ const UploadExcel = () => {
     setShowModal(false); // Close modal after upload
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
+ const handleCloseModal = () => {
+  setShowModal(false);
+  navigate("/dashboard");
+};
   const handleAskQuestion = async () => {
     if (!question.trim()) return;
     setLoading(true);
@@ -130,8 +132,8 @@ const UploadExcel = () => {
           {/* Header with Toggle */}
           <header className="flex flex-col items-center gap-4">
             {/* Toggle Button */}
-            <div className="relative flex w-full rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-0.9 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
-              {[
+            <div className="relative flex w-full md:w-auto rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-0.9 hover:shadow-2xl transition-all duration-300 backdrop-blur-sm">
+            {[
                 { id: "analytics", label: "📊 Analytics" },
                 { id: "assistant", label: "🤖 Ask AI" },
               ].map((tab) => (
