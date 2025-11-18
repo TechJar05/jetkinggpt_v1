@@ -27,27 +27,28 @@
 // } from "recharts";
 
 // const tableIcons = {
-//   users: "👥",
-//   orders: "📦",
-//   products: "🛍️",
-//   sales: "💰",
-//   customers: "👨‍💼",
-//   inventory: "📊",
-//   transactions: "💳",
-//   employees: "👔",
 //   student_data: "🎓",
+//   students: "🧑‍🎓",
+//   enrollments: "📝",
+//   centers: "🏫",
+//   courses: "📚",
+//   enrollment_status: "📌",
+//   jetking_student_details: "🗂️",
+//   payment_details: "💳",
+//   merged_student_data: "🔀",
 // };
 
+
 // const tableColors = {
-//   users: "from-purple-500 to-blue-500",
-//   orders: "from-blue-500 to-cyan-500",
-//   products: "from-cyan-500 to-teal-500",
-//   sales: "from-purple-600 to-pink-500",
-//   customers: "from-pink-500 to-rose-500",
-//   inventory: "from-teal-500 to-green-500",
-//   transactions: "from-orange-500 to-red-500",
-//   employees: "from-indigo-500 to-purple-500",
 //   student_data: "from-purple-600 to-indigo-600",
+//   students: "from-purple-600 to-indigo-600",
+//   enrollments: "from-purple-600 to-indigo-600",
+//   centers: "from-purple-600 to-indigo-600",
+//   courses: "from-purple-600 to-indigo-600",
+//   enrollment_status: "from-purple-600 to-indigo-600",
+//   jetking_student_details: "from-purple-600 to-indigo-600",
+//   payment_details: "from-purple-600 to-indigo-600",
+//   merged_student_data: "from-purple-600 to-indigo-600",
 // };
 
 // const CHART_COLORS = [
@@ -312,6 +313,71 @@
 //     }
 //   }
 
+//   // ---------- DATAFRAME (from AI response) ----------
+//   if (chart.type === "dataframe") {
+//     try {
+//       const hasColumnsAndRows =
+//         Array.isArray(chart.columns) && Array.isArray(chart.rows);
+//       if (!hasColumnsAndRows || chart.rows.length === 0) return null;
+
+//       return (
+//         <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
+//           <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+//             <TableIcon size={20} className="text-purple-600" />
+//             {chart.title || "Data Result"}
+//           </h4>
+//           <div className="overflow-x-auto rounded-lg border-2 border-gray-200 max-h-96">
+//             <table className="w-full text-sm">
+//               <thead>
+//                 <tr className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+//                   {chart.columns.map((header, idx) => (
+//                     <th
+//                       key={idx}
+//                       className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide whitespace-nowrap"
+//                     >
+//                       {String(header).replace(/_/g, " ")}
+//                     </th>
+//                   ))}
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {chart.rows.map((row, rowIdx) => (
+//                   <tr
+//                     key={rowIdx}
+//                     className={`border-b border-gray-200 hover:bg-purple-50 transition-colors ${
+//                       rowIdx % 2 === 0 ? "bg-gray-50" : "bg-white"
+//                     }`}
+//                   >
+//                     {row.map((cell, cellIdx) => {
+//                       const value =
+//                         typeof cell === "number"
+//                           ? cell.toLocaleString(undefined, {
+//                               maximumFractionDigits: 2,
+//                             })
+//                           : String(cell);
+
+//                       return (
+//                         <td
+//                           key={cellIdx}
+//                           className="px-4 py-3 text-gray-700 whitespace-nowrap"
+//                         >
+//                           {value}
+//                         </td>
+//                       );
+//                     })}
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </div>
+//       );
+//     } catch (error) {
+//       console.error("Error rendering dataframe:", error);
+//       return null;
+//     }
+//   }
+
 //   // Unknown chart type
 //   return null;
 // };
@@ -332,7 +398,9 @@
 //     question,
 //     setQuestion,
 //     answer,
+//     visualization,
 //     loading: aiLoading,
+//     error: aiError,
 //     askQuestion,
 //     resetAssistant,
 //   } = useAIAssistant();
@@ -358,7 +426,15 @@
 //   };
 
 //   const handleAskQuestion = () => {
-//     askQuestion(question, selectedTable);
+//     if (question.trim() && selectedTable) {
+//       askQuestion(question, selectedTable);
+//     }
+//   };
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !aiLoading && question.trim()) {
+//       handleAskQuestion();
+//     }
 //   };
 
 //   // ---------- TABLES LOADING ----------
@@ -394,94 +470,95 @@
 //     );
 //   }
 
-//   // ---------- TABLE SELECTION VIEW ----------
-//   if (!dashboardData) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
-//         <div className="max-w-6xl mx-auto">
-//           <header className="text-center mb-12">
-//             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-4 shadow-lg">
-//               <Database className="text-white" size={32} />
-//             </div>
-//             <h2 className="text-4xl font-bold text-gray-900 mb-2">
-//               Analytics Dashboard
-//             </h2>
-//             <p className="text-gray-600">
-//               Select a table to generate AI-powered insights
-//             </p>
-//           </header>
-
-//           {dashboardError && (
-//             <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
-//               <AlertCircle className="text-red-500" size={20} />
-//               <p className="text-red-700 text-sm">{dashboardError}</p>
-//             </div>
-//           )}
-
-//           <div className="grid gap-6 md:grid-cols-2 mb-8">
-//             {tables.map((table) => (
-//               <button
-//                 key={table}
-//                 onClick={() => handleTableSelect(table)}
-//                 className={`group relative overflow-hidden rounded-2xl p-8 border-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
-//                   tempSelectedTable === table
-//                     ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-xl scale-105"
-//                     : "border-gray-200 bg-white hover:border-purple-300 shadow-md"
-//                 }`}
-//               >
-//                 <div className="flex items-center gap-4">
-//                   <div
-//                     className={`w-16 h-16 rounded-xl bg-gradient-to-br ${
-//                       tableColors[table] || "from-purple-500 to-purple-700"
-//                     } flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform`}
-//                   >
-//                     {tableIcons[table] || "📋"}
-//                   </div>
-//                   <div className="text-left flex-1">
-//                     <h3 className="text-2xl font-bold text-gray-900 mb-1 capitalize">
-//                       {table.replace(/_/g, " ")}
-//                     </h3>
-//                     <p className="text-sm text-gray-600">
-//                       View {table.replace(/_/g, " ")} analytics
-//                     </p>
-//                   </div>
-//                   {tempSelectedTable === table && (
-//                     <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-//                       <span className="text-white text-lg">✓</span>
-//                     </div>
-//                   )}
-//                 </div>
-//               </button>
-//             ))}
+// // ---------- TABLE SELECTION VIEW ----------
+// if (!dashboardData) {
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
+//       <div className="max-w-6xl mx-auto">
+//         <header className="text-center mb-8">
+//           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-3 shadow-md">
+//             <Database className="text-white" size={24} />
 //           </div>
+//           <h2 className="text-xl font-semibold text-gray-900 mb-1">
+//             Analytics Dashboard
+//           </h2>
+//           <p className="text-sm text-gray-600">
+//             Select a table to generate AI-powered insights
+//           </p>
+//         </header>
 
-//           <div className="text-center">
+//         {dashboardError && (
+//           <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+//             <AlertCircle className="text-red-500" size={18} />
+//             <p className="text-red-700 text-xs">{dashboardError}</p>
+//           </div>
+//         )}
+
+//         <div className="grid gap-4 md:grid-cols-2 mb-6">
+//           {tables.map((table) => (
 //             <button
-//               onClick={handleGenerateDashboard}
-//               disabled={!tempSelectedTable || loading}
-//               className={`inline-flex items-center gap-3 px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg transform ${
-//                 tempSelectedTable && !loading
-//                   ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-xl active:scale-95"
-//                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
+//               key={table}
+//               onClick={() => handleTableSelect(table)}
+//               className={`group relative overflow-hidden rounded-xl p-4 border transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg ${
+//                 tempSelectedTable === table
+//                   ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-md"
+//                   : "border-gray-200 bg-white hover:border-purple-300 shadow-sm"
 //               }`}
 //             >
-//               {loading ? (
-//                 <>
-//                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-//                   <span>Generating Dashboard...</span>
-//                 </>
-//               ) : (
-//                 <>
-//                   <Sparkles size={20} />
-//                   <span>Generate Dashboard</span>
-//                 </>
-//               )}
+//               <div className="flex items-center gap-3">
+//                 <div
+//                   className={`w-8 h-8 rounded-lg bg-gradient-to-br ${
+//                     tableColors[table] || "from-purple-500 to-purple-700"
+//                   } flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform`}
+//                 >
+//                   {tableIcons[table] || "📋"}
+//                 </div>
+//                 <div className="text-left flex-1">
+//                   <h3 className="text-base font-semibold text-gray-900 mb-0.5 capitalize">
+//                     {table.replace(/_/g, " ")}
+//                   </h3>
+//                   <p className="text-xs text-gray-500">
+//                     View {table.replace(/_/g, " ")} analytics
+//                   </p>
+//                 </div>
+//                 {tempSelectedTable === table && (
+//                   <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+//                     <span className="text-white text-sm">✓</span>
+//                   </div>
+//                 )}
+//               </div>
 //             </button>
-//           </div>
+//           ))}
+//         </div>
+
+//         <div className="text-center">
+//           <button
+//             onClick={handleGenerateDashboard}
+//             disabled={!tempSelectedTable || loading}
+//             className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md transform ${
+//               tempSelectedTable && !loading
+//                 ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg active:scale-95"
+//                 : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
+//             }`}
+//           >
+//             {loading ? (
+//               <>
+//                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+//                 <span>Generating...</span>
+//               </>
+//             ) : (
+//               <>
+//                 <Sparkles size={16} />
+//                 <span>Generate Dashboard</span>
+//               </>
+//             )}
+//           </button>
 //         </div>
 //       </div>
-//     );
-//   }
+//     </div>
+//   );
+// }
+
 
 //   // ---------- DASHBOARD VIEW ----------
 //   return (
@@ -627,6 +704,14 @@
 //                 {selectedTable.replace(/_/g, " ")} data
 //               </p>
 
+//               {/* Error Display */}
+//               {aiError && (
+//                 <div className="mb-4 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+//                   <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
+//                   <p className="text-red-700 text-sm">{aiError}</p>
+//                 </div>
+//               )}
+
 //               <div className="flex flex-col space-y-4">
 //                 <textarea
 //                   className="w-full min-h-[140px] rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-gray-50 hover:bg-white hover:border-gray-300 transition-all"
@@ -636,6 +721,8 @@
 //                   )}?`}
 //                   value={question}
 //                   onChange={(e) => setQuestion(e.target.value)}
+//                   onKeyDown={handleKeyDown}
+//                   disabled={aiLoading}
 //                 />
 
 //                 <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -650,10 +737,14 @@
 //                       <span>✨ Ask Question</span>
 //                     )}
 //                   </button>
+//                   <p className="text-xs text-gray-500">
+//                     Press Ctrl+Enter to send
+//                   </p>
 //                 </div>
 
+//                 {/* Answer Text */}
 //                 {answer && (
-//                   <div className="mt-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 max-h-96 overflow-y-auto shadow-inner">
+//                   <div className="mt-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
 //                     <div className="flex items-center gap-2 mb-2">
 //                       <span className="text-lg">💡</span>
 //                       <span className="font-bold text-gray-800">Answer</span>
@@ -661,6 +752,13 @@
 //                     <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
 //                       {answer}
 //                     </p>
+//                   </div>
+//                 )}
+
+//                 {/* Visualization Chart */}
+//                 {visualization && (
+//                   <div className="mt-4">
+//                     <ChartRenderer chart={visualization} />
 //                   </div>
 //                 )}
 //               </div>
@@ -679,7 +777,8 @@
 //                       key={preset}
 //                       type="button"
 //                       onClick={() => setQuestion(preset)}
-//                       className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all transform hover:scale-105"
+//                       disabled={aiLoading}
+//                       className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
 //                     >
 //                       {preset}
 //                     </button>
@@ -697,7 +796,6 @@
 // export default Dashboard;
 
 
-
 import React, { useState } from "react";
 import {
   Database,
@@ -706,8 +804,11 @@ import {
   MessageSquare,
   AlertCircle,
   TrendingUp,
-  Table as TableIcon,
+  Table,
+  X,
+  Send,
 } from "lucide-react";
+
 import { useDbDashboard } from "../hooks/useDbDashboard";
 import { useAIAssistant } from "../hooks/useAIAssistant";
 import {
@@ -738,7 +839,6 @@ const tableIcons = {
   merged_student_data: "🔀",
 };
 
-
 const tableColors = {
   student_data: "from-purple-600 to-indigo-600",
   students: "from-purple-600 to-indigo-600",
@@ -767,7 +867,6 @@ const CHART_COLORS = [
 const ChartRenderer = ({ chart }) => {
   if (!chart || !chart.type || !chart.data) return null;
 
-  // ---------- BAR ----------
   if (chart.type === "bar") {
     try {
       const hasLabelsAndValues =
@@ -842,7 +941,6 @@ const ChartRenderer = ({ chart }) => {
     }
   }
 
-  // ---------- PIE ----------
   if (chart.type === "pie") {
     try {
       const hasLabelsAndValues =
@@ -904,7 +1002,6 @@ const ChartRenderer = ({ chart }) => {
     }
   }
 
-  // ---------- LINE ----------
   if (chart.type === "line") {
     try {
       const hasLabelsAndValues =
@@ -948,7 +1045,6 @@ const ChartRenderer = ({ chart }) => {
     }
   }
 
-  // ---------- TABLE ----------
   if (chart.type === "table") {
     try {
       const hasHeadersAndRows =
@@ -958,7 +1054,7 @@ const ChartRenderer = ({ chart }) => {
       return (
         <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
           <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <TableIcon size={20} className="text-purple-600" />
+            <Table size={20} className="text-purple-600" />
             {chart.title || "Data Table"}
           </h4>
           <div className="overflow-x-auto rounded-lg border-2 border-gray-200 max-h-96">
@@ -1013,7 +1109,6 @@ const ChartRenderer = ({ chart }) => {
     }
   }
 
-  // ---------- DATAFRAME (from AI response) ----------
   if (chart.type === "dataframe") {
     try {
       const hasColumnsAndRows =
@@ -1023,7 +1118,7 @@ const ChartRenderer = ({ chart }) => {
       return (
         <div className="bg-white rounded-xl p-6 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow">
           <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <TableIcon size={20} className="text-purple-600" />
+            <Table size={20} className="text-purple-600" />
             {chart.title || "Data Result"}
           </h4>
           <div className="overflow-x-auto rounded-lg border-2 border-gray-200 max-h-96">
@@ -1078,35 +1173,36 @@ const ChartRenderer = ({ chart }) => {
     }
   }
 
-  // Unknown chart type
   return null;
 };
 
 const Dashboard = () => {
+  const dbDashboard = useDbDashboard();
+const aiAssistant = useAIAssistant();
   const {
-    tables,
-    selectedTable,
-    dashboardData,
-    loading,
-    error: dashboardError,
-    tablesLoading,
-    generateDashboard,
-    resetDashboard,
-  } = useDbDashboard();
+    tables = [],
+    selectedTable = "",
+    dashboardData = null,
+    loading = false,
+    error: dashboardError = null,
+    tablesLoading = false,
+    generateDashboard = () => {},
+    resetDashboard = () => {},
+  } = dbDashboard || {};
 
   const {
-    question,
-    setQuestion,
-    answer,
-    visualization,
-    loading: aiLoading,
-    error: aiError,
-    askQuestion,
-    resetAssistant,
-  } = useAIAssistant();
+    question = "",
+    setQuestion = () => {},
+    answer = null,
+    visualization = null,
+    loading: aiLoading = false,
+    error: aiError = null,
+    askQuestion = () => {},
+    resetAssistant = () => {},
+  } = aiAssistant || {};
 
   const [tempSelectedTable, setTempSelectedTable] = useState("");
-  const [activeTab, setActiveTab] = useState("analytics");
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
 
   const handleTableSelect = (tableName) => {
     setTempSelectedTable(tableName);
@@ -1122,7 +1218,7 @@ const Dashboard = () => {
     resetDashboard();
     resetAssistant();
     setTempSelectedTable("");
-    setActiveTab("analytics");
+    setIsAIChatOpen(false);
   };
 
   const handleAskQuestion = () => {
@@ -1137,7 +1233,6 @@ const Dashboard = () => {
     }
   };
 
-  // ---------- TABLES LOADING ----------
   if (tablesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 flex items-center justify-center">
@@ -1149,7 +1244,6 @@ const Dashboard = () => {
     );
   }
 
-  // ---------- TABLES ERROR ----------
   if (dashboardError && !dashboardData && tables.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 flex items-center justify-center p-4">
@@ -1170,101 +1264,97 @@ const Dashboard = () => {
     );
   }
 
-// ---------- TABLE SELECTION VIEW ----------
-if (!dashboardData) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-3 shadow-md">
-            <Database className="text-white" size={24} />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">
-            Analytics Dashboard
-          </h2>
-          <p className="text-sm text-gray-600">
-            Select a table to generate AI-powered insights
-          </p>
-        </header>
+  if (!dashboardData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <header className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-700 mb-3 shadow-md">
+              <Database className="text-white" size={24} />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+              Analytics Dashboard
+            </h2>
+            <p className="text-sm text-gray-600">
+              Select a table to generate AI-powered insights
+            </p>
+          </header>
 
-        {dashboardError && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
-            <AlertCircle className="text-red-500" size={18} />
-            <p className="text-red-700 text-xs">{dashboardError}</p>
-          </div>
-        )}
+          {dashboardError && (
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+              <AlertCircle className="text-red-500" size={18} />
+              <p className="text-red-700 text-xs">{dashboardError}</p>
+            </div>
+          )}
 
-        <div className="grid gap-4 md:grid-cols-2 mb-6">
-          {tables.map((table) => (
+          <div className="grid gap-4 md:grid-cols-2 mb-6">
+            {tables.map((table) => (
+              <button
+                key={table}
+                onClick={() => handleTableSelect(table)}
+                className={`group relative overflow-hidden rounded-xl p-4 border transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg ${
+                  tempSelectedTable === table
+                    ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-md"
+                    : "border-gray-200 bg-white hover:border-purple-300 shadow-sm"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-8 h-8 rounded-lg bg-gradient-to-br ${
+                      tableColors[table] || "from-purple-500 to-purple-700"
+                    } flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform`}
+                  >
+                    {tableIcons[table] || "📋"}
+                  </div>
+                  <div className="text-left flex-1">
+                    <h3 className="text-base font-semibold text-gray-900 mb-0.5 capitalize">
+                      {table.replace(/_/g, " ")}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      View {table.replace(/_/g, " ")} analytics
+                    </p>
+                  </div>
+                  {tempSelectedTable === table && (
+                    <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+                      <span className="text-white text-sm">✓</span>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="text-center">
             <button
-              key={table}
-              onClick={() => handleTableSelect(table)}
-              className={`group relative overflow-hidden rounded-xl p-4 border transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg ${
-                tempSelectedTable === table
-                  ? "border-purple-500 bg-gradient-to-br from-purple-50 to-white shadow-md"
-                  : "border-gray-200 bg-white hover:border-purple-300 shadow-sm"
+              onClick={handleGenerateDashboard}
+              disabled={!tempSelectedTable || loading}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md transform ${
+                tempSelectedTable && !loading
+                  ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg active:scale-95"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-lg bg-gradient-to-br ${
-                    tableColors[table] || "from-purple-500 to-purple-700"
-                  } flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform`}
-                >
-                  {tableIcons[table] || "📋"}
-                </div>
-                <div className="text-left flex-1">
-                  <h3 className="text-base font-semibold text-gray-900 mb-0.5 capitalize">
-                    {table.replace(/_/g, " ")}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    View {table.replace(/_/g, " ")} analytics
-                  </p>
-                </div>
-                {tempSelectedTable === table && (
-                  <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
-                  </div>
-                )}
-              </div>
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={16} />
+                  <span>Generate Dashboard</span>
+                </>
+              )}
             </button>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <button
-            onClick={handleGenerateDashboard}
-            disabled={!tempSelectedTable || loading}
-            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-md transform ${
-              tempSelectedTable && !loading
-                ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg active:scale-95"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
-            }`}
-          >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                <span>Generating...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles size={16} />
-                <span>Generate Dashboard</span>
-              </>
-            )}
-          </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-
-  // ---------- DASHBOARD VIEW ----------
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 p-4 md:p-8 relative">
+      <div className={`max-w-7xl mx-auto space-y-8 transition-all duration-300 ${isAIChatOpen ? 'mr-96' : ''}`}>
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 tracking-tight capitalize">
@@ -1282,7 +1372,6 @@ if (!dashboardData) {
           </button>
         </header>
 
-        {/* KPI cards from summary (fully dynamic) */}
         {dashboardData?.summary &&
           Object.keys(dashboardData.summary).length > 0 && (
             <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -1313,181 +1402,165 @@ if (!dashboardData) {
             </section>
           )}
 
-        {/* Toggle */}
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 shadow-xl border-2 border-gray-200/50 p-1 hover:shadow-2xl transition-all duration-300">
-            <button
-              onClick={() => setActiveTab("analytics")}
-              className={`px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${
-                activeTab === "analytics"
-                  ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              📊 Analytics
-            </button>
-            <button
-              onClick={() => setActiveTab("assistant")}
-              className={`px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${
-                activeTab === "assistant"
-                  ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white shadow-md"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              🤖 AI Assistant
-            </button>
-          </div>
-        </div>
+        <section className="space-y-6">
+          {dashboardData?.charts && dashboardData.charts.length > 0 ? (
+            <div className="grid gap-6 lg:grid-cols-2">
+              {dashboardData.charts.map((chart, idx) => (
+                <ChartRenderer
+                  key={`${selectedTable}-${chart.type || "chart"}-${
+                    chart.title || "untitled"
+                  }-${idx}`}
+                  chart={chart}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl p-12 text-center border-2 border-gray-200">
+              <BarChart3 className="mx-auto mb-4 text-gray-300" size={48} />
+              <p className="text-gray-500">
+                No chart data available for this table
+              </p>
+            </div>
+          )}
 
-        {/* Content */}
-        {activeTab === "analytics" ? (
-          <section className="space-y-6">
-            {dashboardData?.charts && dashboardData.charts.length > 0 ? (
-              <div className="grid gap-6 lg:grid-cols-2">
-                {dashboardData.charts.map((chart, idx) => (
-                  <ChartRenderer
-                    key={`${selectedTable}-${chart.type || "chart"}-${
-                      chart.title || "untitled"
-                    }-${idx}`}
-                    chart={chart}
-                  />
-                ))}
+          {dashboardData?.insights &&
+            Array.isArray(dashboardData.insights) &&
+            dashboardData.insights.length > 0 && (
+              <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span>💡</span>
+                  Key Insights
+                </h3>
+                <ul className="space-y-3">
+                  {dashboardData.insights.map((insight, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-start gap-3 text-gray-700"
+                    >
+                      <span className="text-purple-600 font-bold mt-0.5 text-lg">
+                        •
+                      </span>
+                      <span className="text-sm leading-relaxed">
+                        {insight}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ) : (
-              <div className="bg-white rounded-2xl p-12 text-center border-2 border-gray-200">
-                <BarChart3 className="mx-auto mb-4 text-gray-300" size={48} />
-                <p className="text-gray-500">
-                  No chart data available for this table
-                </p>
+            )}
+        </section>
+      </div>
+
+      <button
+        onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+        className="fixed top-6 right-6 z-40 p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg hover:shadow-xl transition-all hover:scale-110 active:scale-95"
+        title={isAIChatOpen ? "Close AI Assistant" : "Open AI Assistant"}
+      >
+        {isAIChatOpen ? <X size={24} /> : <MessageSquare size={24} />}
+      </button>
+
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-30 border-l-2 border-purple-100 ${
+          isAIChatOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="h-full flex flex-col">
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <MessageSquare size={20} />
+                </div>
+                <h3 className="text-xl font-bold">AI Assistant</h3>
+              </div>
+            </div>
+            <p className="text-sm text-purple-100">
+              Ask questions about {selectedTable.replace(/_/g, " ")} data
+            </p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {aiError && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+                <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
+                <p className="text-red-700 text-sm">{aiError}</p>
               </div>
             )}
 
-            {dashboardData?.insights &&
-              Array.isArray(dashboardData.insights) &&
-              dashboardData.insights.length > 0 && (
-                <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span>💡</span>
-                    Key Insights
-                  </h3>
-                  <ul className="space-y-3">
-                    {dashboardData.insights.map((insight, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-3 text-gray-700"
-                      >
-                        <span className="text-purple-600 font-bold mt-0.5 text-lg">
-                          •
-                        </span>
-                        <span className="text-sm leading-relaxed">
-                          {insight}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-          </section>
-        ) : (
-          <section>
-            <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100 hover:shadow-xl transition-shadow max-w-4xl mx-auto">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                  <MessageSquare className="text-purple-600" size={20} />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">
-                  AI Assistant
-                </h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-6 ml-13">
-                Ask questions about your{" "}
-                {selectedTable.replace(/_/g, " ")} data
+            <div>
+              <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                💭 Suggested Questions
               </p>
-
-              {/* Error Display */}
-              {aiError && (
-                <div className="mb-4 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
-                  <AlertCircle className="text-red-500 flex-shrink-0" size={20} />
-                  <p className="text-red-700 text-sm">{aiError}</p>
-                </div>
-              )}
-
-              <div className="flex flex-col space-y-4">
-                <textarea
-                  className="w-full min-h-[140px] rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-gray-50 hover:bg-white hover:border-gray-300 transition-all"
-                  placeholder={`e.g. What are the top insights from ${selectedTable.replace(
-                    /_/g,
-                    " "
-                  )}?`}
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={aiLoading}
-                />
-
-                <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex flex-col gap-2">
+                {[
+                  `Show summary statistics`,
+                  `What are the key insights?`,
+                  `Analyze trends and patterns`,
+                ].map((preset) => (
                   <button
-                    onClick={handleAskQuestion}
-                    disabled={aiLoading || !question.trim()}
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
+                    key={preset}
+                    type="button"
+                    onClick={() => setQuestion(preset)}
+                    disabled={aiLoading}
+                    className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {aiLoading ? (
-                      <span className="animate-pulse">🤔 Thinking...</span>
-                    ) : (
-                      <span>✨ Ask Question</span>
-                    )}
+                    {preset}
                   </button>
-                  <p className="text-xs text-gray-500">
-                    Press Ctrl+Enter to send
-                  </p>
-                </div>
-
-                {/* Answer Text */}
-                {answer && (
-                  <div className="mt-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">💡</span>
-                      <span className="font-bold text-gray-800">Answer</span>
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {answer}
-                    </p>
-                  </div>
-                )}
-
-                {/* Visualization Chart */}
-                {visualization && (
-                  <div className="mt-4">
-                    <ChartRenderer chart={visualization} />
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t-2 border-gray-100 pt-5 mt-6">
-                <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-                  💭 Suggested Questions
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    `Show summary statistics`,
-                    `What are the key insights?`,
-                    `Analyze trends and patterns`,
-                  ].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setQuestion(preset)}
-                      disabled={aiLoading}
-                      className="text-xs px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-700 hover:text-white font-medium border-2 border-gray-200 hover:border-purple-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {preset}
-                    </button>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
-          </section>
-        )}
+
+            {answer && (
+              <div className="rounded-xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 p-5 shadow-inner">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">🤖</span>
+                  <h4 className="text-sm font-bold text-gray-900">AI Response</h4>
+                </div>
+                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {answer}
+                </div>
+              </div>
+            )}
+
+            {visualization && (
+              <div className="mt-4">
+                <ChartRenderer chart={visualization} />
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 border-t-2 border-gray-100 bg-gray-50">
+            <div className="flex gap-2">
+              <textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask a question about your data..."
+                rows={3}
+                disabled={aiLoading}
+                className="flex-1 px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              />
+              <button
+                onClick={handleAskQuestion}
+                disabled={aiLoading || !question.trim()}
+                className={`self-end px-4 py-3 rounded-xl transition-all transform ${
+                  aiLoading || !question.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 hover:scale-105 active:scale-95 shadow-md"
+                }`}
+              >
+                {aiLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                ) : (
+                  <Send size={20} />
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Press Ctrl+Enter to send
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
