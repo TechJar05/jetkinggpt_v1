@@ -585,7 +585,7 @@ const aiAssistant = useAIAssistant();
           </div>
           <button
             onClick={handleReset}
-            className="px-1 py-1 rounded-lg bg-white border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all font-medium shadow-sm"
+            className="px-1 py-1 rounded-lg mr-12 bg-white border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50 transition-all font-medium shadow-sm"
           >
             ← Change Table
           </button>
